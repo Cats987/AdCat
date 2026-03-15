@@ -185,23 +185,22 @@ body {
 }
 
 #main-content {
-    display: grid;
-    grid-template-columns: 2fr 1.2fr;
-    gap: 25px;
+    display: block; /* Change from grid to block since we use tabs */
     flex: 1;
-    min-height: 0; /* Critical for flex shrinking */
+    min-height: 0;
     overflow: hidden;
+    position: relative;
 }
 
 .tab-pane {
     display: none;
     height: 100%;
-    min-height: 0;
+    width: 100%;
 }
 
 .tab-pane.active {
-    display: flex;
-    flex-direction: column;
+    display: block;
+    height: 100%;
 }
 
 .panel {
@@ -215,6 +214,8 @@ body {
     border-top: 1px solid rgba(255, 255, 255, 0.15);
     display: flex;
     flex-direction: column;
+    height: 100%;
+    max-height: 100%;
     overflow: hidden;
 }
 
