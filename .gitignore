@@ -8,12 +8,4 @@ www/
 .DS_Store
 package-lock.json
 capacitor.config.ts
-manifest.json
-service-worker.js
-main.js
-preload.js
-icon.png
-index.html
-index.css
-js/
-# Only need the web files for GH Pages
+# Keep these web files: index.html, index.css, manifest.json, service-worker.js, icon.png, js/

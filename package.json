@@ -1,0 +1,44 @@
+{
+  "name": "adcat",
+  "version": "1.0.0",
+  "description": "AdCat: Infinite Purr-fits - an idle cat empire game",
+  "author": "AdCat Dev",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.adcat.game",
+    "productName": "AdCat",
+    "files": [
+      "index.html",
+      "index.css",
+      "js/**",
+      "main.js",
+      "preload.js"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable",
+        "dir"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.2.0",
+    "@capacitor/cli": "^8.2.0",
+    "@capacitor/core": "^8.2.0",
+    "discord-rpc": "^4.0.1"
+  }
+}

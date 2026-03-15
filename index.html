@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdCat: Infinite Purr-fits</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a14">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AdCat">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="bg-particles" id="bg-particles"></div>
+    <div id="game-container">
+        <!-- Header: Currency Display -->
+        <header id="header">
+            <div class="currency-display">
+                <h1><span id="catnip-amount">0</span></h1>
+                <p>Catnip</p>
+                <div class="cps-display">per second: <span id="catnip-per-second">0</span></div>
+                <div class="celestial-nip-display" style="display: none;" id="celestial-nip-container">
+                    🌀 <span id="celestial-nip-amount">0</span> Celestial Nip
+                </div>
+                <div class="golden-yarn-display" style="display: none;" id="golden-yarn-container">
+                    ✨ <span id="golden-yarn-amount">0</span> Golden Yarn
+                </div>
+                <div class="yarn-progress" style="display: none;" id="yarn-progress-container">
+                    Next Yarn at: <span id="yarn-progress-amount">0</span> Lifetime Catnip
+                </div>
+            </div>
+            
+            <div class="header-buttons">
+                <button id="transcend-btn" class="manual-btn prestige-btn celestial-btn" style="display: none;">
+                    <div class="cat-paw">🌀</div>
+                    <span>Transcend</span>
+                </button>
+                <button id="ascend-btn" class="manual-btn prestige-btn" style="display: none;">
+                    <div class="cat-paw">✨</div>
+                    <span>Ascend</span>
+                </button>
+                <button id="save-export-btn" class="manual-btn save-btn">
+                    <div class="cat-paw">💾</div>
+                    <span>Save / Load</span>
+                </button>
+                <button id="manual-click-btn" class="manual-btn">
+                    <div class="cat-paw">🐾</div>
+                    <span>Gather Catnip</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Tabs Navigation -->
+        <nav id="game-tabs">
+            <button class="tab-btn active" data-tab="generators">Generators</button>
+            <button class="tab-btn" data-tab="upgrades">Upgrades</button>
+            <button class="tab-btn" data-tab="celestial" id="celestial-tab-btn" style="display: none;">Celestial</button>
+        </nav>
+
+        <!-- Main Layout: Panels tied to tabs -->
+        <main id="main-content">
+            <section id="generators-tab" class="tab-pane active">
+                <div class="panel">
+                    <h2>Cat-pital Ventures</h2>
+                    <div id="generators-list">
+                        <!-- Generators will be injected here by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <section id="upgrades-tab" class="tab-pane">
+                <div class="panel">
+                    <h2>Meow-grades</h2>
+                    
+                    <div id="golden-upgrades-container" style="display: none;">
+                        <button id="toggle-golden-btn" class="collapse-btn">
+                            <h3 class="golden-title">Golden Upgrades <span id="golden-collapse-icon">▼</span></h3>
+                        </button>
+                        <div id="golden-upgrades-list"></div>
+                        <hr class="upgrade-divider">
+                    </div>
+
+                    <div id="owned-upgrades-container" style="display: none;">
+                        <h3 class="owned-title">Owned Upgrades</h3>
+                        <div id="owned-upgrades-list"></div>
+                        <hr class="upgrade-divider">
+                    </div>
+                    
+                    <div id="upgrades-list">
+                        <!-- Upgrades will be injected here by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <section id="celestial-tab" class="tab-pane">
+                <div class="panel celestial-panel">
+                    <h2>Celestial Perks</h2>
+                    <p class="celestial-desc">Powerful boons that persist through all forms of reset.</p>
+                    <div id="celestial-perks-list">
+                        <!-- Perks will be injected here by JS -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Ascension Modal -->
+    <div id="ascension-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2>Cosmic Ascension</h2>
+            <p>Your feline empire has grown too large for this mortal plane. Ascend now to surrender all your Catnip, businesses, and standard upgrades.</p>
+            <p>In exchange, the Cosmic Feline will grant you: <strong id="pending-yarn" class="yarn-text">0</strong> Golden Yarn.</p>
+            <p class="warning-text">Each Golden Yarn provides a permanent +2% global production bonus.</p>
+            <div class="modal-buttons">
+                <button id="confirm-ascend-btn" class="btn-primary">Ascend</button>
+                <button id="cancel-ascend-btn" class="btn-secondary">Not Yet</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Offline earnings modal -->
+    <div id="offline-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content offline-modal-content">
+            <div class="offline-icon">😴</div>
+            <h2>Welcome Back!</h2>
+            <p class="offline-time-msg" id="offline-time-msg"></p>
+            <div class="offline-earned">
+                <span id="offline-earned-amount"></span>
+                <span class="offline-earned-label">Catnip earned</span>
+            </div>
+            <p id="offline-cap-msg" class="warning-text" style="display:none;">
+                ⚠️ Earnings were capped at 8 hours. Buy the <strong>Sleep Purr-ductivity</strong> golden upgrade to be notified sooner!
+            </p>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button id="offline-ok-btn" class="btn-primary">Collect!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save/Load Modal -->
+    <div id="save-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content save-modal-content">
+            <h2>💾 Save / Load</h2>
+            <p>Copy your save string to back up your progress, or paste one below to restore a save.</p>
+            <textarea id="save-string-box" class="save-textarea" rows="5" placeholder="Your save code will appear here..."></textarea>
+            <div class="modal-buttons">
+                <button id="copy-save-btn" class="btn-primary">Copy Save</button>
+                <button id="import-save-btn" class="btn-primary" style="background: linear-gradient(135deg, #9d4edd, #c77dff); color: #fff;">Import Save</button>
+                <button id="close-save-btn" class="btn-secondary">Close</button>
+            </div>
+            <p id="save-status-msg" style="margin-top: 12px; font-size: 0.9rem; min-height: 1.2em;"></p>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+    <!-- Transcendence Modal -->
+    <div id="transcendence-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content celestial-modal">
+            <div class="celestial-icon">🌀</div>
+            <h2>Universal Transcendence</h2>
+            <p>You have touched the edge of the feline collective consciousness. Transcending will reset <strong>EVERYTHING</strong>.</p>
+            <p>Your Catnip, Generators, Upgrades, Golden Yarn, and Golden Upgrades will all be surrendered to the void.</p>
+            <p>In exchange, you will awaken with: <strong id="pending-celestial" class="celestial-text">0</strong> Celestial Nip.</p>
+            <p class="warning-text">Celestial Perks are permanent and incredibly powerful.</p>
+            <div class="modal-buttons">
+                <button id="confirm-transcend-btn" class="btn-primary celestial-btn">Transcend</button>
+                <button id="cancel-transcend-btn" class="btn-secondary">Hold Back</button>
+            </div>
+        </div>
+    </div>
+    <!-- PWA Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./service-worker.js')
+            .then(reg => console.log('Service Worker registered!', reg))
+            .catch(err => console.error('Service Worker failed:', err));
+        });
+      }
+    </script>
+</body>
+</html>
