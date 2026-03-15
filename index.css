@@ -28,10 +28,11 @@ body {
     animation: gradientBG 20s ease infinite;
     color: var(--text-main);
     font-family: var(--font-family);
-    min-height: 100vh;
-    overflow-x: hidden;
-    overflow-y: auto;
+    height: 100dvh;
+    width: 100vw;
+    overflow: hidden;
     position: relative;
+    margin: 0;
 }
 
 @keyframes gradientBG {
@@ -73,8 +74,9 @@ body {
     padding: 25px;
     display: flex;
     flex-direction: column;
-    gap: 25px;
-    min-height: 100vh;
+    gap: 20px;
+    height: 100%;
+    width: 100%;
     position: relative;
     z-index: 1;
 }
@@ -187,7 +189,19 @@ body {
     grid-template-columns: 2fr 1.2fr;
     gap: 25px;
     flex: 1;
+    min-height: 0; /* Critical for flex shrinking */
     overflow: hidden;
+}
+
+.tab-pane {
+    display: none;
+    height: 100%;
+    min-height: 0;
+}
+
+.tab-pane.active {
+    display: flex;
+    flex-direction: column;
 }
 
 .panel {
@@ -221,14 +235,15 @@ body {
     margin-left: 15px;
 }
 
-#generators-list, #upgrades-list {
+#generators-list, #upgrades-list, #celestial-perks-list {
+    flex: 1;
     overflow-y: auto;
-    max-height: 70vh;
     display: flex;
     flex-direction: column;
     gap: 18px;
     padding-right: 15px;
     padding-bottom: 20px;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Scrollbar styling */
@@ -486,25 +501,34 @@ body {
 @media (max-width: 992px) {
     #main-content {
         grid-template-columns: 1fr;
-        overflow: visible;
     }
     
     #game-container {
-        height: auto;
-        min-height: 100vh;
-    }
-    
-    #generators-list, #upgrades-list {
-        overflow-y: visible;
-        max-height: none;
+        padding: 15px;
+        gap: 15px;
     }
     
     .currency-display h1 {
-        font-size: 3rem;
+        font-size: 2.5rem;
     }
 
-    .panel {
-        overflow: visible;
+    #header {
+        padding: 20px;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .header-buttons {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .manual-btn {
+        padding: 12px;
+        font-size: 1rem;
+        justify-content: center;
     }
 }
 
