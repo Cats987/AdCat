@@ -80,6 +80,7 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     padding: 25px;
+    padding-top: calc(20px + env(safe-area-inset-top));
     display: flex;
     flex-direction: column;
     gap: 20px;

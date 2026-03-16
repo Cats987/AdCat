@@ -13,17 +13,17 @@ class GameManager {
             upgrades: [],
             lastTick: Date.now()
         };
-        
+
         this.state = this.loadState();
         this.generatorDefs = GENERATORS_DATA;
         this.upgradeDefs = UPGRADES_DATA;
         this.goldenDefs = GOLDEN_UPGRADES_DATA;
-        
+
         // Calculate offline progress before UI init so CpS is based on saved state
         const offlineResult = this.calculateOfflineProgress();
 
         this.ui = new UI(this);
-        
+
         // Show offline popup now that the UI exists
         if (offlineResult) {
             this.ui.showOfflineModal(offlineResult);
@@ -36,11 +36,11 @@ class GameManager {
         // Discord RPC update interval
         this.rpcUpdateInterval = 15000; // update Discord status every 15 seconds
         this.timeSinceLastRPC = 0;
-        
+
         this.gameLoop = this.gameLoop.bind(this);
         requestAnimationFrame(this.gameLoop);
     }
-    
+
     loadState() {
         const saved = localStorage.getItem('adcat_save');
         if (saved) {
@@ -55,12 +55,12 @@ class GameManager {
         }
         return { ...this.defaults };
     }
-    
+
     saveState() {
         this.state.lastTick = Date.now();
         localStorage.setItem('adcat_save', JSON.stringify(this.state));
     }
-    
+
     calculateOfflineProgress() {
         const now = Date.now();
         const diffInSeconds = (now - this.state.lastTick) / 1000;
@@ -90,9 +90,9 @@ class GameManager {
     gameLoop(currentTime) {
         const deltaTime = (currentTime - this.lastTime) / 1000; // in seconds
         this.lastTime = currentTime;
-        
+
         this.tick(deltaTime);
-        
+
         this.timeSinceLastSave += deltaTime * 1000;
         if (this.timeSinceLastSave >= this.saveInterval) {
             this.saveState();
@@ -104,7 +104,7 @@ class GameManager {
             this.updateDiscordRPC();
             this.timeSinceLastRPC = 0;
         }
-        
+
         requestAnimationFrame(this.gameLoop);
     }
 
@@ -117,23 +117,23 @@ class GameManager {
             });
         }
     }
-    
+
     tick(deltaTime) {
         const cps = this.calculateCpS();
         const gain = cps * deltaTime;
         this.state.catnip += gain;
         this.state.lifetimeCatnip += gain;
-        
+
         this.ui.update(this.state);
     }
-    
+
     calculateCpS() {
         let totalCps = 0;
         let globalMultiplier = 1;
-        
+
         // Golden Yarn Bonus: 3% per yarn (2% production + 1% CpS bonus)
         globalMultiplier *= 1 + (this.state.goldenYarn * 0.03);
-        
+
         // Standard Global Multipliers
         this.state.upgrades.forEach(upgId => {
             const def = this.upgradeDefs.find(u => u.id === upgId);
@@ -154,7 +154,7 @@ class GameManager {
         if (this.state.celestialPerks.includes('perk_nebula_purr')) {
             globalMultiplier *= 25;
         }
-        
+
         // Calculate production for each generator
         for (const genId in this.state.generators) {
             const owned = this.state.generators[genId];
@@ -162,16 +162,16 @@ class GameManager {
                 totalCps += this.getGeneratorProduction(genId) * owned;
             }
         }
-        
+
         return totalCps * globalMultiplier;
     }
-    
+
     getGeneratorProduction(genId) {
         const def = this.generatorDefs.find(g => g.id === genId);
         if (!def) return 0;
-        
+
         let production = def.baseProduction;
-        
+
         // Apply specific standard multipliers
         this.state.upgrades.forEach(upgId => {
             const upgDef = this.upgradeDefs.find(u => u.id === upgId);
@@ -179,7 +179,7 @@ class GameManager {
                 production *= upgDef.multiplier;
             }
         });
-        
+
         // Apply Golden Synergy
         this.state.goldenUpgrades.forEach(upgId => {
             const upgDef = this.goldenDefs.find(u => u.id === upgId);
@@ -187,32 +187,32 @@ class GameManager {
                 production *= upgDef.value;
             }
         });
-        
+
         return production;
     }
-    
+
     getGeneratorCost(genId) {
         const def = this.generatorDefs.find(g => g.id === genId);
         if (!def) return 0;
-        
+
         const owned = this.state.generators[genId] || 0;
         let cost = def.baseCost * Math.pow(def.costMultiplier, owned);
-        
+
         // Apply Golden Discount
         if (this.state.goldenUpgrades.includes('gold_discount')) {
             cost *= 0.9;
         }
-        
+
         return cost;
     }
-    
+
     getGeneratorDefs() { return this.generatorDefs; }
     getUpgradeDefs() { return this.upgradeDefs; }
     getGoldenDefs() { return this.goldenDefs; }
-    
+
     getClickPower() {
         let power = 1;
-        
+
         // Golden Click Bonus (1% of CpS)
         if (this.state.goldenUpgrades.includes('gold_click')) {
             power += this.calculateCpS() * 0.01;
@@ -222,27 +222,27 @@ class GameManager {
         if (this.state.celestialPerks.includes('perk_speed_claws')) {
             power += this.calculateCpS() * 0.05;
         }
-        
+
         this.state.upgrades.forEach(upgId => {
             const def = this.upgradeDefs.find(u => u.id === upgId);
             if (def && def.target === 'click') {
                 power *= def.multiplier;
             }
         });
-        
+
         return power;
     }
-    
+
     manualClick() {
         const power = this.getClickPower();
         this.state.catnip += power;
         this.state.lifetimeCatnip += power;
         this.ui.update(this.state);
     }
-    
+
     buyGenerator(genId) {
         const cost = this.getGeneratorCost(genId);
-        
+
         if (this.state.catnip >= cost) {
             this.state.catnip -= cost;
             if (!this.state.generators[genId]) {
@@ -251,18 +251,18 @@ class GameManager {
             this.state.generators[genId]++;
         }
     }
-    
+
     buyUpgrade(upgId) {
         const def = this.upgradeDefs.find(u => u.id === upgId);
-        
+
         if (def && this.state.catnip >= def.cost && !this.state.upgrades.includes(upgId)) {
             this.state.catnip -= def.cost;
             this.state.upgrades.push(upgId);
         }
     }
-    
+
     // Prestige Mechanics
-    
+
     calculatePendingYarn() {
         // Formula: cube root of (lifetime catnip / 64,000,000)
         if (this.state.lifetimeCatnip < 64000000) return 0;
@@ -275,26 +275,26 @@ class GameManager {
 
         return yarn;
     }
-    
+
     getRequiredCatnipForNextYarn() {
         const currentPending = this.calculatePendingYarn();
         const nextYarnTarget = currentPending + 1;
         return Math.pow(nextYarnTarget, 3) * 64000000;
     }
-    
+
     ascend() {
         const gainedYarn = this.calculatePendingYarn();
         if (gainedYarn > 0) {
             this.state.goldenYarn += gainedYarn;
             this.state.totalGoldenYarn += gainedYarn;
             this.state.ascensions++;
-            
+
             // Reset standard progress
             this.state.catnip = 0;
-            this.state.lifetimeCatnip = 0; 
+            this.state.lifetimeCatnip = 0;
             this.state.generators = {};
             this.state.upgrades = [];
-            
+
             this.saveState();
             this.ui.init(); // Refresh UI completely
         }
@@ -311,7 +311,7 @@ class GameManager {
         if (gainedCelestial > 0) {
             this.state.celestialNip += gainedCelestial;
             this.state.totalGoldenYarn = 0; // Reset tracking for next tier
-            
+
             // Full Reset
             this.state.catnip = 0;
             this.state.lifetimeCatnip = 0;
@@ -320,7 +320,7 @@ class GameManager {
             this.state.generators = {};
             this.state.upgrades = [];
             this.state.goldenUpgrades = [];
-            
+
             this.saveState();
             this.ui.init();
         }
@@ -335,10 +335,10 @@ class GameManager {
             this.ui.update(this.state);
         }
     }
-    
+
     buyGoldenUpgrade(upgId) {
         const def = this.goldenDefs.find(u => u.id === upgId);
-        
+
         if (def && this.state.goldenYarn >= def.cost && !this.state.goldenUpgrades.includes(upgId)) {
             this.state.goldenYarn -= def.cost;
             this.state.goldenUpgrades.push(upgId);
@@ -370,5 +370,5 @@ class GameManager {
 window.addEventListener('DOMContentLoaded', () => {
     window.game = new GameManager(); // expose to window for debugging
 });
-    
+
 
