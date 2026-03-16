@@ -574,6 +574,15 @@ body {
     align-items: center;
 }
 
+.collapse-btn span {
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.collapsed {
+    transform: rotate(-90deg);
+}
+
 #golden-collapse-icon {
     font-size: 0.9rem;
     transition: transform 0.3s;

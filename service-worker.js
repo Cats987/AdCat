@@ -1,5 +1,5 @@
-const CACHE_NAME = 'adcat-cache-v5';
-const ASSETS = [
+const CACHE_NAME = 'adcat-cache-v6';
+const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './index.css',
