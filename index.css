@@ -80,7 +80,7 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     padding: 25px;
-    padding-top: calc(20px + env(safe-area-inset-top));
+    padding-top: calc(25px + env(safe-area-inset-top));
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -88,6 +88,12 @@ body {
     width: 100%;
     position: relative;
     z-index: 1;
+}
+
+/* Specific fix for Android if safe-area-inset-top fails */
+.capacitor-android #game-container {
+    padding-top: 45px; /* Generous gap for status bar */
+    border-top: 4px solid var(--accent-primary); /* Request: slight border to the top */
 }
 
 #header {
