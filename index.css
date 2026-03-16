@@ -91,9 +91,9 @@ body {
 }
 
 /* Specific fix for Android if safe-area-inset-top fails */
-.capacitor-android #game-container {
-    padding-top: 45px; /* Generous gap for status bar */
-    border-top: 4px solid var(--accent-primary); /* Request: slight border to the top */
+.capacitor-android body {
+    padding-top: 50px !important; /* Force a gap at the top of the entire screen */
+    border-top: 3px solid var(--accent-primary) !important; /* Visual border request */
 }
 
 #header {
