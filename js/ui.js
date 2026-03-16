@@ -146,26 +146,16 @@ class UI {
         if (this.toggleGoldenBtn) {
             this.toggleGoldenBtn.addEventListener('click', () => {
                 this.goldenCollapsed = !this.goldenCollapsed;
-                if (this.goldenCollapsed) {
-                    this.goldenUpgradesList.style.display = 'none';
-                    this.goldenCollapseIcon.classList.add('collapsed');
-                } else {
-                    this.goldenUpgradesList.style.display = 'flex';
-                    this.goldenCollapseIcon.classList.remove('collapsed');
-                }
+                this.goldenUpgradesList.classList.toggle('hidden', this.goldenCollapsed);
+                this.goldenCollapseIcon.classList.toggle('collapsed', this.goldenCollapsed);
             });
         }
 
         if (this.toggleOwnedBtn) {
             this.toggleOwnedBtn.addEventListener('click', () => {
                 this.ownedCollapsed = !this.ownedCollapsed;
-                if (this.ownedCollapsed) {
-                    this.ownedUpgradesList.style.display = 'none';
-                    this.ownedCollapseIcon.classList.add('collapsed');
-                } else {
-                    this.ownedUpgradesList.style.display = 'flex';
-                    this.ownedCollapseIcon.classList.remove('collapsed');
-                }
+                this.ownedUpgradesList.classList.toggle('hidden', this.ownedCollapsed);
+                this.ownedCollapseIcon.classList.toggle('collapsed', this.ownedCollapsed);
             });
         }
 
