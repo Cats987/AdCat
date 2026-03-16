@@ -187,6 +187,15 @@
             .catch(err => console.error('Service Worker failed:', err));
         });
       }
+
+      // Manual platform detection for Capacitor
+      document.addEventListener('DOMContentLoaded', () => {
+          const isAndroid = /Android/i.test(navigator.userAgent);
+          if (isAndroid) {
+              document.body.classList.add('capacitor-android');
+              console.log('Android detected, added capacitor-android class');
+          }
+      });
     </script>
 </body>
 </html>

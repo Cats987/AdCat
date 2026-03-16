@@ -91,9 +91,10 @@ body {
 }
 
 /* Specific fix for Android if safe-area-inset-top fails */
-.capacitor-android body {
-    padding-top: 50px !important; /* Force a gap at the top of the entire screen */
-    border-top: 3px solid var(--accent-primary) !important; /* Visual border request */
+.capacitor-android #game-container {
+    margin-top: 50px !important; /* Physically push the container down */
+    border-top: 5px solid var(--accent-primary) !important; /* Thick visual border */
+    padding-top: 10px !important;
 }
 
 #header {
