@@ -23,7 +23,11 @@ class UI {
         this.toggleGoldenBtn = document.getElementById('toggle-golden-btn');
         this.goldenCollapseIcon = document.getElementById('golden-collapse-icon');
         
+        this.toggleOwnedBtn = document.getElementById('toggle-owned-btn');
+        this.ownedCollapseIcon = document.getElementById('owned-collapse-icon');
+        
         this.goldenCollapsed = false;
+        this.ownedCollapsed = false;
         
         // Modals
         this.modal = document.getElementById('ascension-modal');
@@ -147,9 +151,20 @@ class UI {
                     this.goldenCollapseIcon.classList.add('collapsed');
                 } else {
                     this.goldenUpgradesList.style.display = 'flex';
-                    // We set it to multiple styles in css so resetting to empty reverts to default flex direction
-                    this.goldenUpgradesList.style.display = ''; 
                     this.goldenCollapseIcon.classList.remove('collapsed');
+                }
+            });
+        }
+
+        if (this.toggleOwnedBtn) {
+            this.toggleOwnedBtn.addEventListener('click', () => {
+                this.ownedCollapsed = !this.ownedCollapsed;
+                if (this.ownedCollapsed) {
+                    this.ownedUpgradesList.style.display = 'none';
+                    this.ownedCollapseIcon.classList.add('collapsed');
+                } else {
+                    this.ownedUpgradesList.style.display = 'flex';
+                    this.ownedCollapseIcon.classList.remove('collapsed');
                 }
             });
         }

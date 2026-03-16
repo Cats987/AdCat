@@ -1,3 +1,7 @@
+html {
+    height: 100%;
+}
+
 :root {
     --bg-color-main: #130f1a;
     --bg-color-panel: rgba(32, 24, 46, 0.45);
@@ -28,8 +32,8 @@ body {
     animation: gradientBG 20s ease infinite;
     color: var(--text-main);
     font-family: var(--font-family);
-    height: 100dvh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     overflow: hidden;
     position: relative;
     margin: 0;
@@ -185,7 +189,8 @@ body {
 }
 
 #main-content {
-    display: block; /* Change from grid to block since we use tabs */
+    display: flex;
+    flex-direction: column;
     flex: 1;
     min-height: 0;
     overflow: hidden;
@@ -194,13 +199,14 @@ body {
 
 .tab-pane {
     display: none;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
     width: 100%;
 }
 
 .tab-pane.active {
-    display: block;
-    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .panel {
