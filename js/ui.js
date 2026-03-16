@@ -400,7 +400,7 @@ class UI {
         this.cpsDisplay.textContent = this.formatNumber(this.game.calculateCpS());
         
         // Celestial Display Logic
-        if (state.totalGoldenYarn >= 100 || state.celestialNip > 0) {
+        if (state.totalGoldenYarn >= 10 || state.celestialNip > 0) {
             this.celestialNipContainer.style.display = 'block';
             this.celestialNipAmount.textContent = this.formatNumber(state.celestialNip);
             this.celestialTabBtn.style.display = 'block';

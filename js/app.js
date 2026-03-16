@@ -301,9 +301,9 @@ class GameManager {
     }
 
     calculatePendingCelestialNip() {
-        // Gain 1 Celestial Nip per 1,000 Total Golden Yarn
-        if (this.state.totalGoldenYarn < 1000) return 0;
-        return Math.floor(this.state.totalGoldenYarn / 1000);
+        // Gain 1 Celestial Nip per 100 Total Golden Yarn
+        if (this.state.totalGoldenYarn < 100) return 0;
+        return Math.floor(this.state.totalGoldenYarn / 100);
     }
 
     transcend() {
