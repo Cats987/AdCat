@@ -92,7 +92,7 @@ body {
 
 /* Specific fix for Android if safe-area-inset-top fails */
 .capacitor-android #game-container {
-    margin-top: 50px !important; /* Physically push the container down */
+    margin-top: 70px !important; /* Physically push the container down further */
     border-top: 5px solid var(--accent-primary) !important; /* Thick visual border */
     padding-top: 10px !important;
 }
