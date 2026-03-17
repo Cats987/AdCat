@@ -58,10 +58,8 @@ class UI {
         this.saveStatusMsg = document.getElementById('save-status-msg');
 
         // Owned upgrades display
-        this.ownedUpgradesContainer = document.getElementById('owned-upgrades-container');
+        this.ownedUpgradesList = document.getElementById('owned-upgrades-container'); // Wait, check ID
         this.ownedUpgradesList = document.getElementById('owned-upgrades-list');
-        
-        this.multButtons = document.querySelectorAll('.mult-btn');
         
         this.init();
     }
@@ -76,6 +74,8 @@ class UI {
         this.upgradeButtons = {};
         this.goldenButtons = {};
         this.perkButtons = {};
+        
+        this.multButtons = document.querySelectorAll('.mult-btn');
         
         if (!document.querySelector('.particle')) {
             this.createBackgroundParticles();
@@ -283,6 +283,7 @@ class UI {
                     </div>
                 </div>
                 <button class="buy-btn" id="buy-gen-${def.id}">
+                    <span class="buy-label" id="gen-label-${def.id}">Buy x1</span>
                     <span class="cost" id="gen-cost-${def.id}">0</span>
                     <span class="owned">Owned: <span id="gen-owned-${def.id}">0</span></span>
                 </button>
@@ -480,7 +481,11 @@ class UI {
             document.getElementById(`gen-prod-${def.id}`).textContent = this.formatNumber(production);
             
             const btn = this.generatorButtons[def.id];
-            btn.innerHTML = `<div class="cat-paw">🐾</div> Buy x${displayAmount}`;
+            // Update the button text node specifically without nuking the spans
+            // Structure is: [cost span] [owned span] [text node]
+            // We'll add a label span in setupGenerators to make this cleaner
+            const labelEl = document.getElementById(`gen-label-${def.id}`);
+            if (labelEl) labelEl.textContent = `Buy x${displayAmount}`;
 
             if (state.catnip >= cost && displayAmount > 0) {
                 btn.removeAttribute('disabled');
