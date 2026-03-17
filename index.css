@@ -404,31 +404,36 @@ body {
     background: rgba(0,0,0,0.3);
     border: 2px solid var(--accent-primary);
     color: var(--text-main);
-    padding: 12px 25px;
+    padding: 12px 20px;
     border-radius: var(--border-radius-md);
     font-family: var(--font-family);
     cursor: pointer;
     transition: all var(--transition-fast);
-    min-width: 120px;
+    min-width: 140px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
     overflow: hidden;
+    gap: 2px;
+}
+
+.buy-label {
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: 2px;
 }
 
 .buy-btn span.cost {
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: var(--accent-primary);
-    transition: color var(--transition-fast);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-secondary);
 }
 
 .buy-btn span.owned {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     opacity: 0.7;
-    margin-top: 4px;
 }
 
 .buy-btn:hover:not(:disabled) {
@@ -437,7 +442,8 @@ body {
     box-shadow: 0 6px 15px rgba(157, 78, 221, 0.4);
 }
 
-.buy-btn:hover:not(:disabled) span.cost {
+.buy-btn:hover:not(:disabled) span.cost,
+.buy-btn:hover:not(:disabled) .buy-label {
     color: #fff;
 }
 
@@ -448,6 +454,9 @@ body {
 .buy-btn:disabled {
     border-color: rgba(255, 255, 255, 0.05);
     background: rgba(0,0,0,0.1);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
     cursor: not-allowed;
 }
 
