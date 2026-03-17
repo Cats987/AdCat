@@ -457,8 +457,6 @@ body {
     cursor: not-allowed;
     opacity: 0.5;
 }
-    cursor: not-allowed;
-}
 
 .buy-btn:disabled span.cost {
     color: rgba(255, 255, 255, 0.2);

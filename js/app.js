@@ -30,9 +30,12 @@ class GameManager {
             this.ui.showOfflineModal(offlineResult);
         }
 
-        this.lastTime = performance.now();
         this.saveInterval = 5000; // auto save every 5 seconds
         this.timeSinceLastSave = 0;
+
+        // UI update throttling (20Hz)
+        this.uiUpdateInterval = 0.05; 
+        this.timeSinceLastUIUpdate = 0;
 
         // Discord RPC update interval
         this.rpcUpdateInterval = 15000; // update Discord status every 15 seconds
@@ -125,7 +128,12 @@ class GameManager {
         this.state.catnip += gain;
         this.state.lifetimeCatnip += gain;
 
-        this.ui.update(this.state);
+        // Throttle UI updates to 20Hz for performance
+        this.timeSinceLastUIUpdate += deltaTime;
+        if (this.timeSinceLastUIUpdate >= this.uiUpdateInterval) {
+            this.ui.update(this.state);
+            this.timeSinceLastUIUpdate = 0;
+        }
     }
 
     calculateCpS() {

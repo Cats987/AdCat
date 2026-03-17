@@ -414,53 +414,23 @@ class UI {
     }
     
     update(state) {
-        this.catnipDisplay.textContent = this.formatNumber(state.catnip);
-        this.cpsDisplay.textContent = this.formatNumber(this.game.calculateCpS());
-        
-        // Celestial Display Logic
-        if (state.totalGoldenYarn >= 10 || state.celestialNip > 0) {
-            this.celestialNipContainer.style.display = 'block';
-            this.celestialNipAmount.textContent = this.formatNumber(state.celestialNip);
-            this.celestialTabBtn.style.display = 'block';
-            
-            if (this.game.calculatePendingCelestialNip() > 0) {
-                this.transcendBtn.style.display = 'flex';
-            } else {
-                this.transcendBtn.style.display = 'none';
-            }
-        } else {
-            this.celestialNipContainer.style.display = 'none';
-            this.transcendBtn.style.display = 'none';
-            this.celestialTabBtn.style.display = 'none';
-        }
-
-        // Prestige Display Logic
-        if (state.goldenYarn > 0 || state.lifetimeCatnip >= 64000000 || state.ascensions > 0) {
-            this.goldenYarnContainer.style.display = 'block';
-            this.goldenYarnAmount.textContent = this.formatNumber(state.goldenYarn);
-            this.goldenUpgradesContainer.style.display = 'block';
-            
-            if (this.game.calculatePendingYarn() > 0) {
-                this.ascendBtn.style.display = 'flex';
-            } else {
-                this.ascendBtn.style.display = 'none';
-            }
-        } else {
-            this.goldenYarnContainer.style.display = 'none';
-            this.ascendBtn.style.display = 'none';
-            this.goldenUpgradesContainer.style.display = 'none';
-        }
-
-        // Yarn Progress tracker - visible early so the player has a long term goal
-        if (state.lifetimeCatnip >= 1000 || state.ascensions > 0) {
-            if (this.yarnProgressContainer) {
-                this.yarnProgressContainer.style.display = 'block';
-                this.yarnProgressAmount.textContent = this.formatNumber(this.game.getRequiredCatnipForNextYarn());
-            }
-        } else {
-            if (this.yarnProgressContainer) this.yarnProgressContainer.style.display = 'none';
+        // High-frequency number updates (Catnip and CPS)
+        const catnipText = this.formatNumber(state.catnip);
+        if (this.catnipDisplay.textContent !== catnipText) {
+            this.catnipDisplay.textContent = catnipText;
         }
         
+        const cpsText = this.formatNumber(this.game.calculateCpS());
+        if (this.cpsDisplay.textContent !== cpsText) {
+            this.cpsDisplay.textContent = cpsText;
+        }
+        
+        // Cache heavy display checks to avoid frequent DOM toggles
+        if (!this._lastYarnCheck || Date.now() - this._lastYarnCheck > 250) {
+            this._lastYarnCheck = Date.now();
+            this.updatePrestigeVisibility(state);
+        }
+
         // Update generators
         const defs = this.game.getGeneratorDefs();
         defs.forEach(def => {
@@ -470,26 +440,33 @@ class UI {
             let displayAmount = buyAmount;
             if (buyAmount === 'max') {
                 displayAmount = this.game.getMaxAffordable(def.id);
-                if (displayAmount === 0) displayAmount = 1; // Default to showing cost of 1
+                if (displayAmount === 0) displayAmount = 1;
             }
 
             const cost = this.game.getBulkCost(def.id, displayAmount);
             const production = this.game.getGeneratorProduction(def.id);
             
-            document.getElementById(`gen-owned-${def.id}`).textContent = owned;
-            document.getElementById(`gen-cost-${def.id}`).textContent = this.formatNumber(cost);
-            document.getElementById(`gen-prod-${def.id}`).textContent = this.formatNumber(production);
-            
-            const btn = this.generatorButtons[def.id];
-            // Update the button text node specifically without nuking the spans
-            // Structure is: [cost span] [owned span] [text node]
-            // We'll add a label span in setupGenerators to make this cleaner
-            const labelEl = document.getElementById(`gen-label-${def.id}`);
-            if (labelEl) labelEl.textContent = `Buy x${displayAmount}`;
+            // Cached DOM updates
+            const ownedEl = document.getElementById(`gen-owned-${def.id}`);
+            if (ownedEl.textContent !== owned.toString()) ownedEl.textContent = owned;
 
-            if (state.catnip >= cost && displayAmount > 0) {
+            const costEl = document.getElementById(`gen-cost-${def.id}`);
+            const costText = this.formatNumber(cost);
+            if (costEl.textContent !== costText) costEl.textContent = costText;
+
+            const prodEl = document.getElementById(`gen-prod-${def.id}`);
+            const prodText = this.formatNumber(production);
+            if (prodEl.textContent !== prodText) prodEl.textContent = prodText;
+            
+            const labelEl = document.getElementById(`gen-label-${def.id}`);
+            const labelText = `Buy x${displayAmount}`;
+            if (labelEl && labelEl.textContent !== labelText) labelEl.textContent = labelText;
+
+            const btn = this.generatorButtons[def.id];
+            const canAfford = state.catnip >= cost && displayAmount > 0;
+            if (canAfford && btn.hasAttribute('disabled')) {
                 btn.removeAttribute('disabled');
-            } else {
+            } else if (!canAfford && !btn.hasAttribute('disabled')) {
                 btn.setAttribute('disabled', 'true');
             }
         });
@@ -499,12 +476,14 @@ class UI {
         upgDefs.forEach(def => {
             const item = document.getElementById(`upgrade-item-${def.id}`);
             if (state.upgrades.includes(def.id)) {
-                item.style.display = 'none'; // hide bought upgrades
+                if (item.style.display !== 'none') item.style.display = 'none';
             } else {
-                if (state.catnip >= def.cost) {
-                    this.upgradeButtons[def.id].removeAttribute('disabled');
-                } else {
-                    this.upgradeButtons[def.id].setAttribute('disabled', 'true');
+                const canAfford = state.catnip >= def.cost;
+                const btn = this.upgradeButtons[def.id];
+                if (canAfford && btn.hasAttribute('disabled')) {
+                    btn.removeAttribute('disabled');
+                } else if (!canAfford && !btn.hasAttribute('disabled')) {
+                    btn.setAttribute('disabled', 'true');
                 }
             }
         });
@@ -544,6 +523,46 @@ class UI {
         });
 
         this.updateOwnedUpgrades(state);
+    }
+    
+    updatePrestigeVisibility(state) {
+        // Celestial Display Logic
+        if (state.totalGoldenYarn >= 10 || state.celestialNip > 0) {
+            this.celestialNipContainer.style.display = 'block';
+            this.celestialNipAmount.textContent = this.formatNumber(state.celestialNip);
+            this.celestialTabBtn.style.display = 'block';
+            
+            const pendingCelestial = this.game.calculatePendingCelestialNip();
+            this.transcendBtn.style.display = (pendingCelestial > 0) ? 'flex' : 'none';
+        } else {
+            this.celestialNipContainer.style.display = 'none';
+            this.transcendBtn.style.display = 'none';
+            this.celestialTabBtn.style.display = 'none';
+        }
+
+        // Prestige Display Logic
+        if (state.goldenYarn > 0 || state.lifetimeCatnip >= 64000000 || state.ascensions > 0) {
+            this.goldenYarnContainer.style.display = 'block';
+            this.goldenYarnAmount.textContent = this.formatNumber(state.goldenYarn);
+            this.goldenUpgradesContainer.style.display = 'block';
+            
+            const pendingYarn = this.game.calculatePendingYarn();
+            this.ascendBtn.style.display = (pendingYarn > 0) ? 'flex' : 'none';
+        } else {
+            this.goldenYarnContainer.style.display = 'none';
+            this.ascendBtn.style.display = 'none';
+            this.goldenUpgradesContainer.style.display = 'none';
+        }
+
+        // Yarn Progress tracker
+        if (state.lifetimeCatnip >= 1000 || state.ascensions > 0) {
+            if (this.yarnProgressContainer) {
+                this.yarnProgressContainer.style.display = 'block';
+                this.yarnProgressAmount.textContent = this.formatNumber(this.game.getRequiredCatnipForNextYarn());
+            }
+        } else {
+            if (this.yarnProgressContainer) this.yarnProgressContainer.style.display = 'none';
+        }
     }
     
     updateOwnedUpgrades(state) {
