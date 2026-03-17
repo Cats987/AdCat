@@ -236,13 +236,25 @@ body {
     overflow: hidden;
 }
 
+.panel-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
 .panel h2 {
     font-size: 1.8rem;
-    margin-bottom: 25px;
     color: var(--text-main);
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.panel-header-row h2 {
+    margin-bottom: 0;
 }
 
 .panel h2::after {
@@ -251,6 +263,40 @@ body {
     height: 2px;
     background: linear-gradient(90deg, var(--accent-primary), transparent);
     margin-left: 15px;
+    min-width: 50px;
+}
+
+.multiplier-selector {
+    display: flex;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px;
+    border-radius: var(--border-radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mult-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 6px 12px;
+    border-radius: calc(var(--border-radius-md) - 4px);
+    font-family: var(--font-family);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 0.9rem;
+    min-width: 45px;
+}
+
+.mult-btn:hover {
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.mult-btn.active {
+    background: var(--accent-primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(157, 78, 221, 0.4);
 }
 
 #generators-list, #upgrades-list, #celestial-perks-list {

@@ -11,6 +11,7 @@ class GameManager {
             goldenUpgrades: [],
             generators: {},
             upgrades: [],
+            buyAmount: 1, // Default buy amount
             lastTick: Date.now()
         };
 
@@ -192,18 +193,51 @@ class GameManager {
     }
 
     getGeneratorCost(genId) {
+        return this.getBulkCost(genId, this.state.buyAmount || 1);
+    }
+
+    getBulkCost(genId, amount) {
         const def = this.generatorDefs.find(g => g.id === genId);
         if (!def) return 0;
 
         const owned = this.state.generators[genId] || 0;
-        let cost = def.baseCost * Math.pow(def.costMultiplier, owned);
+        const multiplier = def.costMultiplier;
+        let basePrice = def.baseCost * Math.pow(multiplier, owned);
 
         // Apply Golden Discount
         if (this.state.goldenUpgrades.includes('gold_discount')) {
-            cost *= 0.9;
+            basePrice *= 0.9;
         }
 
-        return cost;
+        if (amount === 'max') {
+            amount = this.getMaxAffordable(genId);
+            if (amount <= 0) return basePrice; // Show next 1 cost if afford none
+        }
+
+        if (amount <= 1) return basePrice;
+
+        // Geometric series sum: a(r^n - 1) / (r - 1)
+        const totalCost = basePrice * (Math.pow(multiplier, amount) - 1) / (multiplier - 1);
+        return totalCost;
+    }
+
+    getMaxAffordable(genId) {
+        const def = this.generatorDefs.find(g => g.id === genId);
+        if (!def) return 0;
+
+        const owned = this.state.generators[genId] || 0;
+        const multiplier = def.costMultiplier;
+        let a = def.baseCost * Math.pow(multiplier, owned);
+
+        if (this.state.goldenUpgrades.includes('gold_discount')) {
+            a *= 0.9;
+        }
+
+        if (this.state.catnip < a) return 0;
+
+        // n = log_r((catnip * (r - 1) / a) + 1)
+        const n = Math.floor(Math.log((this.state.catnip * (multiplier - 1) / a) + 1) / Math.log(multiplier));
+        return Math.max(0, n);
     }
 
     getGeneratorDefs() { return this.generatorDefs; }
@@ -241,14 +275,19 @@ class GameManager {
     }
 
     buyGenerator(genId) {
-        const cost = this.getGeneratorCost(genId);
+        let amount = this.state.buyAmount || 1;
+        if (amount === 'max') {
+            amount = this.getMaxAffordable(genId);
+        }
+        
+        const cost = this.getBulkCost(genId, amount);
 
-        if (this.state.catnip >= cost) {
+        if (this.state.catnip >= cost && amount > 0) {
             this.state.catnip -= cost;
             if (!this.state.generators[genId]) {
                 this.state.generators[genId] = 0;
             }
-            this.state.generators[genId]++;
+            this.state.generators[genId] += amount;
         }
     }
 

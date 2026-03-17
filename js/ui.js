@@ -61,6 +61,8 @@ class UI {
         this.ownedUpgradesContainer = document.getElementById('owned-upgrades-container');
         this.ownedUpgradesList = document.getElementById('owned-upgrades-list');
         
+        this.multButtons = document.querySelectorAll('.mult-btn');
+        
         this.init();
     }
     
@@ -162,6 +164,21 @@ class UI {
         // Safety net: hide tooltip if mouse leaves the window
         document.addEventListener('mouseleave', () => this.hideTooltip());
         document.addEventListener('click', () => this.hideTooltip());
+
+        // Multiplier buttons
+        this.multButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                let val = btn.dataset.mult;
+                if (val !== 'max') val = parseInt(val);
+                this.game.state.buyAmount = val;
+                
+                // Update active state
+                this.multButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                this.update(this.game.state);
+            });
+        });
 
         // Save / Load modal
         document.getElementById('save-export-btn').addEventListener('click', () => {
@@ -447,17 +464,28 @@ class UI {
         const defs = this.game.getGeneratorDefs();
         defs.forEach(def => {
             const owned = state.generators[def.id] || 0;
-            const cost = this.game.getGeneratorCost(def.id);
+            const buyAmount = state.buyAmount || 1;
+            
+            let displayAmount = buyAmount;
+            if (buyAmount === 'max') {
+                displayAmount = this.game.getMaxAffordable(def.id);
+                if (displayAmount === 0) displayAmount = 1; // Default to showing cost of 1
+            }
+
+            const cost = this.game.getBulkCost(def.id, displayAmount);
             const production = this.game.getGeneratorProduction(def.id);
             
             document.getElementById(`gen-owned-${def.id}`).textContent = owned;
             document.getElementById(`gen-cost-${def.id}`).textContent = this.formatNumber(cost);
             document.getElementById(`gen-prod-${def.id}`).textContent = this.formatNumber(production);
             
-            if (state.catnip >= cost) {
-                this.generatorButtons[def.id].removeAttribute('disabled');
+            const btn = this.generatorButtons[def.id];
+            btn.innerHTML = `<div class="cat-paw">🐾</div> Buy x${displayAmount}`;
+
+            if (state.catnip >= cost && displayAmount > 0) {
+                btn.removeAttribute('disabled');
             } else {
-                this.generatorButtons[def.id].setAttribute('disabled', 'true');
+                btn.setAttribute('disabled', 'true');
             }
         });
         
