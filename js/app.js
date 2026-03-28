@@ -297,6 +297,7 @@ class GameManager {
                 this.state.generators[genId] = 0;
             }
             this.state.generators[genId] += amount;
+            this.ui.update(this.state);
         }
     }
 
@@ -306,6 +307,7 @@ class GameManager {
         if (def && this.state.catnip >= def.cost && !this.state.upgrades.includes(upgId)) {
             this.state.catnip -= def.cost;
             this.state.upgrades.push(upgId);
+            this.ui.update(this.state);
         }
     }
 
@@ -390,6 +392,7 @@ class GameManager {
         if (def && this.state.goldenYarn >= def.cost && !this.state.goldenUpgrades.includes(upgId)) {
             this.state.goldenYarn -= def.cost;
             this.state.goldenUpgrades.push(upgId);
+            this.ui.update(this.state);
         }
     }
 
