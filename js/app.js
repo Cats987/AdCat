@@ -30,6 +30,7 @@ class GameManager {
             this.ui.showOfflineModal(offlineResult);
         }
 
+        this.lastTime = performance.now();
         this.saveInterval = 5000; // auto save every 5 seconds
         this.timeSinceLastSave = 0;
 
