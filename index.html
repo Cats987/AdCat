@@ -193,7 +193,15 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./service-worker.js')
-            .then(reg => console.log('Service Worker registered!', reg))
+            .then(reg => {
+                console.log('Service Worker registered!', reg);
+                // Force reload when a new service worker takes over
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                   if (window.updatingSW) return;
+                   window.updatingSW = true;
+                   window.location.reload();
+                });
+            })
             .catch(err => console.error('Service Worker failed:', err));
         });
       }
